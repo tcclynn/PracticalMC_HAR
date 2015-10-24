@@ -253,15 +253,8 @@ testing &lt;- testing[,keep.cols==0]
 rf.model &lt;- train(classe~., data=training, method=&quot;rf&quot;,
                   trControl=trainControl(method=&quot;cv&quot;, number=3),
                   prox=TRUE, allowParallel=TRUE)
-</code></pre>
 
-<pre><code>## Error: cannot allocate vector of size 2.9 Gb
-</code></pre>
-
-<pre><code>## Timing stopped at: 437.87 1.39 440.78
-</code></pre>
-
-<pre><code class="r">print(rf.model, digits = 4)
+print(rf.model, digits = 4)
 </code></pre>
 
 <pre><code>## Random Forest 

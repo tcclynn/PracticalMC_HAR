@@ -62,17 +62,7 @@ set.seed(2805)
 rf.model <- train(classe~., data=training, method="rf",
                   trControl=trainControl(method="cv", number=3),
                   prox=TRUE, allowParallel=TRUE)
-```
 
-```
-## Error: cannot allocate vector of size 2.9 Gb
-```
-
-```
-## Timing stopped at: 437.87 1.39 440.78
-```
-
-```r
 print(rf.model, digits = 4)
 ```
 

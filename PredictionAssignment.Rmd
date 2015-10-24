@@ -42,7 +42,7 @@ testing <- testing[,keep.cols==0]
 
 Based on the description of the project and dataset, this is a classification problem. The outcome "classe" is a categorical or qualitative response. I picked random forest method to predict qualitative response. Since there is minimum information on the dataset and random forest modeling is treated as a black-box. The method works well with both continuous and categorical responses, provides Out-of-Bag error (Out-of-Sample) and variable importance information.I picked 3-fold cross validation due to compute time.
 
-```{r warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE, error=FALSE}
 set.seed(2805)
 
 rf.model <- train(classe~., data=training, method="rf",
