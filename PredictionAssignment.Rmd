@@ -1,0 +1,89 @@
+---
+title: "PredictionAssignment"
+author: "Ching Ching Tan"
+date: "October 23, 2015"
+output: html_document
+---
+
+## Overview
+The goal of the project is to predict the manner in which the 6 participant did the exercise. The response or outcome is the "classe" variable in the training set and any variables can be use as the predictors based on the data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+## Data
+Loading the training and testing datasets
+```{r warning=FALSE, message=FALSE}
+library(caret)
+library(randomForest)
+
+train.file <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test.file <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+training <- read.csv(train.file, na.strings=c("NA","#DIV/0!",""))
+testing <- read.csv(test.file, na.strings=c("NA","#DIV/0!",""))
+
+dim(training)
+#names(training)
+
+```
+
+## Features
+The first 7 columns are indexes and are filtered out from the datasets. Predictors with NAs are also removed from the datasets. This reduces the predicters to 52 for the prediction modeling.
+```{r, warning=FALSE, error=FALSE}
+training <- training[,-(1:7)]
+keep.cols <- apply(training,2,function(x) {sum(is.na(x))} )
+training <- training[,keep.cols==0]
+dim(training)
+
+testing <- testing[,-(1:7)]
+testing <- testing[,keep.cols==0]
+
+```
+
+## Modeling
+
+Based on the description of the project and dataset, this is a classification problem. The outcome "classe" is a categorical or qualitative response. I picked random forest method to predict qualitative response. Since there is minimum information on the dataset and random forest modeling is treated as a black-box. The method works well with both continuous and categorical responses, provides Out-of-Bag error (Out-of-Sample) and variable importance information.I picked 3-fold cross validation due to compute time.
+
+```{r warning=FALSE, message=FALSE}
+set.seed(2805)
+
+rf.model <- train(classe~., data=training, method="rf",
+                  trControl=trainControl(method="cv", number=3),
+                  prox=TRUE, allowParallel=TRUE)
+
+print(rf.model, digits = 4)
+```
+
+
+```{r warning=FALSE, message=FALSE}
+rf.model$finalModel
+```
+The study of error estimates for bagged classifiers in Breiman [1996b], gives empirical evidence to show that the out-of-bag estimate is as accurate as using a test set of the same size as the training set. 
+
+The OOB(Out-Of-Bag) error:**0.43%** suggests that the modeling has **99.57%** out of sample accuracy for the training set. For the above modeling ,the expected out of sample error is approximately **0.43%**.
+
+
+Variable Importance of the predictors used in the modeling
+```{r warning=FALSE, message=FALSE}
+varImp(rf.model)
+varImpPlot(rf.model$finalModel)
+
+```
+
+
+## Evaluation
+```{r warning=FALSE, message=FALSE}
+predictions <- predict(rf.model, newdata=testing)
+predictions
+```
+
+## Prediction Assignment Submission 
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(predictions)
+```
